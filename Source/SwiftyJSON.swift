@@ -672,11 +672,8 @@ extension JSON: Swift.RawRepresentable {
 extension JSON: Swift.Printable, Swift.DebugPrintable {
 
     public var description: String {
-        if let string = self.rawString(options:.PrettyPrinted) {
-            return string
-        } else {
-            return "unknown"
-        }
+        guard let string = self.rawString(options:.PrettyPrinted) else { return "unknown" }
+        return string
     }
 
     public var debugDescription: String {
@@ -691,11 +688,8 @@ extension JSON {
     //Optional [JSON]
     public var array: [JSON]? {
         get {
-            if self.type == .Array {
-                return self.rawArray.map{ JSON($0) }
-            } else {
-                return nil
-            }
+            guard self.type == .Array else { return nil }
+            return self.rawArray.map{ JSON($0) }
         }
     }
 
@@ -732,14 +726,11 @@ extension JSON {
 
     //Optional [String : JSON]
     public var dictionary: [String : JSON]? {
-        if self.type == .Dictionary {
-            return self.rawDictionary.reduce([String : JSON](minimumCapacity: count)) { (dictionary: [String : JSON], element: (String, AnyObject)) -> [String : JSON] in
-                var d = dictionary
-                d[element.0] = JSON(element.1)
-                return d
-            }
-        } else {
-            return nil
+        guard self.type == .Dictionary else { return nil }
+        return self.rawDictionary.reduce([String : JSON](minimumCapacity: count)) { (dictionary: [String : JSON], element: (String, AnyObject)) -> [String : JSON] in
+            var d = dictionary
+            d[element.0] = JSON(element.1)
+            return d
         }
     }
 
@@ -783,11 +774,7 @@ extension JSON: Swift.BooleanType {
             }
         }
         set {
-            if let newValue = newValue {
-                self.object = NSNumber(bool: newValue)
-            } else {
-                self.object = NSNull()
-            }
+            self.object = newValue ?? NSNull()
         }
     }
 
